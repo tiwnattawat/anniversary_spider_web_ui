@@ -284,11 +284,6 @@
     border-radius: 16px;
     background: rgba(255, 105, 180, .15);
     margin: 0 auto 14px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 48px;
     box-shadow: inset 0 0 20px rgba(255, 105, 180, 0.2);
   }
 
@@ -366,7 +361,7 @@
 
   <div id="modal-wrap">
     <div id="modal-card">
-      <div id="modal-photo"><span id="modal-emoji"></span></div>
+      <div id="modal-photo"></div>
       <div id="modal-caption"></div>
       <div id="modal-date"></div>
       <button class="modal-close" onclick="closeModal()">
@@ -376,7 +371,7 @@
   </div>
 
   <audio id="bg-music" loop>
-    <source src="bg-music.mp3" type="audio/mpeg">
+    <source src="เพลงรัก - Three Man Down.mp3" type="audio/mpeg">
   </audio>
 
 </div>
@@ -384,18 +379,18 @@
 <script>
   const PASS = "23052568";
   const PHOTOS = [
-    { emoji: "🌸", caption: "วันแรกที่เจอกัน", date: "มิ.ย. 2567" },
-    { emoji: "🎬", caption: "หนังเรื่องแรก", date: "ก.ค. 2567" },
-    { emoji: "🍜", caption: "มื้อพิเศษด้วยกัน", date: "ส.ค. 2567" },
-    { emoji: "🌅", caption: "พระอาทิตย์ตก", date: "ก.ย. 2567" },
-    { emoji: "🎂", caption: "วันเกิดครั้งแรก", date: "ต.ค. 2567" },
-    { emoji: "🌊", caption: "ทะเลด้วยกัน", date: "พ.ย. 2567" },
-    { emoji: "🎄", caption: "คริสต์มาส", date: "ธ.ค. 2567" },
-    { emoji: "🎆", caption: "ปีใหม่ด้วยกัน", date: "ม.ค. 2568" },
-    { emoji: "💐", caption: "วาเลนไทน์", date: "ก.พ. 2568" },
-    { emoji: "🌿", caption: "เที่ยวด้วยกัน", date: "มี.ค. 2568" },
-    { emoji: "🎵", caption: "คอนเสิร์ตแรก", date: "เม.ย. 2568" },
-    { emoji: "💖", caption: "ครบ 1 ปี", date: "มิ.ย. 2568" },
+    { img: "New folder/รูปภาพ iCloud/4F98C5A3.jpg", caption: "วันแรกที่เจอกัน", date: "มิ.ย. 2567" },
+    { img: "New folder/รูปภาพ iCloud/684A8CE7.jpg", caption: "หนังเรื่องแรก", date: "ก.ค. 2567" },
+    { img: "New folder/รูปภาพ iCloud/7EA0C196.jpg", caption: "มื้อพิเศษด้วยกัน", date: "ส.ค. 2567" },
+    { img: "New folder/รูปภาพ iCloud/9E790881.jpg", caption: "พระอาทิตย์ตก", date: "ก.ย. 2567" },
+    { img: "New folder/รูปภาพ iCloud/AB871610.jpg", caption: "วันเกิดครั้งแรก", date: "ต.ค. 2567" },
+    { img: "New folder/รูปภาพ iCloud/B19DBAA9.jpg", caption: "ทะเลด้วยกัน", date: "พ.ย. 2567" },
+    { img: "New folder/รูปภาพ iCloud/IMG_0026.JPEG", caption: "คริสต์มาส", date: "ธ.ค. 2567" },
+    { img: "New folder/รูปภาพ iCloud/IMG_0075.JPEG", caption: "ปีใหม่ด้วยกัน", date: "ม.ค. 2568" },
+    { img: "New folder/รูปภาพ iCloud/IMG_1083.JPEG", caption: "วาเลนไทน์", date: "ก.พ. 2568" },
+    { img: "New folder/รูปภาพ iCloud/IMG_1084.JPEG", caption: "เที่ยวด้วยกัน", date: "มี.ค. 2568" },
+    { img: "New folder/รูปภาพ iCloud/IMG_1307.JPEG", caption: "คอนเสิร์ตแรก", date: "เม.ย. 2568" },
+    { img: "New folder/รูปภาพ iCloud/IMG_1313.JPEG", caption: "ครบ 1 ปี", date: "มิ.ย. 2568" },
   ];
 
   function checkPw() {
@@ -606,17 +601,19 @@
       const el = document.createElement('div');
       el.className = 'photo-node';
       el.id = `node-${i}`;
-      el.innerHTML = `<div class="photo-frame" style="font-size:22px">${p.emoji}</div><div class="photo-month">${p.date.split(' ')[0]}</div>`;
+      el.innerHTML = `<div class="photo-frame" style="background-image: url('${p.img}'); background-size: cover; background-position: center;"></div><div class="photo-month">${p.date.split(' ')[0]}</div>`;
       el.onclick = () => openModal(p);
       wrap.appendChild(el);
     });
   }
 
   function openModal(p) {
-    document.getElementById('modal-emoji').textContent = p.emoji;
+    const modalPhoto = document.getElementById('modal-photo');
+    modalPhoto.style.backgroundImage = `url('${p.img}')`;
+    modalPhoto.style.backgroundSize = 'cover';
+    modalPhoto.style.backgroundPosition = 'center';
     document.getElementById('modal-caption').textContent = p.caption;
     document.getElementById('modal-date').textContent = p.date;
-    document.getElementById('modal-photo').style.fontSize = '72px';
     document.getElementById('modal-wrap').classList.add('open');
   }
 
