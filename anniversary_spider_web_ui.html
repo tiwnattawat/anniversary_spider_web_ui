@@ -330,8 +330,6 @@
   }
 </style>
 
-<h2 class="sr-only">Anniversary Spider Web App — UI prototype</h2>
-
 <div id="app">
 
   <div id="screen-lock">
@@ -351,10 +349,15 @@
     <canvas id="spider-canvas"></canvas>
     <div class="web-top">
       <span class="web-title">365 วัน ของเรา</span>
-      <button class="music-btn" onclick="toggleMusic(this)">
-        <i class="ti ti-player-play" style="font-size:14px" aria-hidden="true"></i>
-        <span>เพลง</span>
-      </button>
+      
+      <div class="music-controls" style="display: flex; align-items: center; gap: 10px;">
+        <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1" oninput="changeVolume(this.value)" style="width: 80px;">
+        <button class="music-btn" id="music-btn" onclick="toggleMusic(this)">
+          <i class="ti ti-player-play" style="font-size:14px" aria-hidden="true"></i>
+          <span>เพลง</span>
+        </button>
+      </div>
+
     </div>
     <div id="nodes-wrap"></div>
   </div>
@@ -379,18 +382,54 @@
 <script>
   const PASS = "23052568";
   const PHOTOS = [
-    { img: "New folder/รูปภาพ iCloud/4F98C5A3.jpg", caption: "วันแรกที่เจอกัน", date: "มิ.ย. 2567" },
-    { img: "New folder/รูปภาพ iCloud/684A8CE7.jpg", caption: "หนังเรื่องแรก", date: "ก.ค. 2567" },
-    { img: "New folder/รูปภาพ iCloud/7EA0C196.jpg", caption: "มื้อพิเศษด้วยกัน", date: "ส.ค. 2567" },
-    { img: "New folder/รูปภาพ iCloud/9E790881.jpg", caption: "พระอาทิตย์ตก", date: "ก.ย. 2567" },
-    { img: "New folder/รูปภาพ iCloud/AB871610.jpg", caption: "วันเกิดครั้งแรก", date: "ต.ค. 2567" },
-    { img: "New folder/รูปภาพ iCloud/B19DBAA9.jpg", caption: "ทะเลด้วยกัน", date: "พ.ย. 2567" },
-    { img: "New folder/รูปภาพ iCloud/IMG_0026.JPEG", caption: "คริสต์มาส", date: "ธ.ค. 2567" },
-    { img: "New folder/รูปภาพ iCloud/IMG_0075.JPEG", caption: "ปีใหม่ด้วยกัน", date: "ม.ค. 2568" },
-    { img: "New folder/รูปภาพ iCloud/IMG_1083.JPEG", caption: "วาเลนไทน์", date: "ก.พ. 2568" },
-    { img: "New folder/รูปภาพ iCloud/IMG_1084.JPEG", caption: "เที่ยวด้วยกัน", date: "มี.ค. 2568" },
-    { img: "New folder/รูปภาพ iCloud/IMG_1307.JPEG", caption: "คอนเสิร์ตแรก", date: "เม.ย. 2568" },
-    { img: "New folder/รูปภาพ iCloud/IMG_1313.JPEG", caption: "ครบ 1 ปี", date: "มิ.ย. 2568" },
+    { img: "New folder/รูปภาพ iCloud/4F98C5A3.jpg", caption: "", date: "13 May 2026" },
+    { img: "New folder/รูปภาพ iCloud/684A8CE7.jpg", caption: "", date: "02 May 2025" },
+    { img: "New folder/รูปภาพ iCloud/7EA0C196.jpg", caption: "", date: "10 Aug 2025" },
+    { img: "New folder/รูปภาพ iCloud/9E790881.jpg", caption: "", date: "10 Aug 2025" },
+    { img: "New folder/รูปภาพ iCloud/AB871610.jpg", caption: "", date: "04 Jul 2025" },
+    { img: "New folder/รูปภาพ iCloud/B19DBAA9.jpg", caption: "", date: "02 May 2025" },
+    { img: "New folder/รูปภาพ iCloud/classicu.jpg", caption: "", date: "03 May 2025" },
+    { img: "New folder/รูปภาพ iCloud/IMG_0026.JPEG", caption: "", date: "06 Dec 2025" },
+    { img: "New folder/รูปภาพ iCloud/IMG_0075.JPEG", caption: "", date: "06 Dec 2025" },
+    { img: "New folder/รูปภาพ iCloud/IMG_0730.JPG", caption: "", date: "13 May 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_0731.JPG", caption: "", date: "13 May 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_0732.JPG", caption: "", date: "13 May 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_0733.JPG", caption: "", date: "13 May 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_0734.JPG", caption: "", date: "13 May 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_0735.JPG", caption: "", date: "13 May 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_0737.JPG", caption: "", date: "13 May 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_0738.JPEG", caption: "", date: "13 May 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_0739.JPEG", caption: "", date: "13 May 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_0946.JPEG", caption: "", date: "24 Jan 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_0952.JPEG", caption: "", date: "24 Jan 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_1083.JPEG", caption: "", date: "24 Jan 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_1084.JPEG", caption: "", date: "24 Jan 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_1307.JPEG", caption: "", date: "14 Feb 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_1313.JPEG", caption: "", date: "14 Feb 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_1317.JPEG", caption: "", date: "14 Feb 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_1331.JPEG", caption: "", date: "14 Feb 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_1335.JPEG", caption: "", date: "14 Feb 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_1336.JPEG", caption: "", date: "14 Feb 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_1468.JPEG", caption: "", date: "06 Mar 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_1470.JPEG", caption: "", date: "06 Mar 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_1771.JPEG", caption: "", date: "05 Apr 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_2411.JPG", caption: "", date: "13 May 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_4653.PNG", caption: "", date: "13 May 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_5056.JPEG", caption: "", date: "05 May 2025" },
+    { img: "New folder/รูปภาพ iCloud/IMG_5063.JPEG", caption: "", date: "05 May 2025" },
+    { img: "New folder/รูปภาพ iCloud/IMG_5563.JPEG", caption: "", date: "01 Jun 2025" },
+    { img: "New folder/รูปภาพ iCloud/IMG_5571.JPEG", caption: "", date: "01 Jun 2025" },
+    { img: "New folder/รูปภาพ iCloud/IMG_5604.JPEG", caption: "", date: "01 Jun 2025" },
+    { img: "New folder/รูปภาพ iCloud/IMG_5792.JPEG", caption: "", date: "14 Jun 2025" },
+    { img: "New folder/รูปภาพ iCloud/IMG_5797.JPEG", caption: "", date: "14 Jun 2025" },
+    { img: "New folder/รูปภาพ iCloud/IMG_6219.JPEG", caption: "", date: "11 Jul 2025" },
+    { img: "New folder/รูปภาพ iCloud/IMG_7251.JPEG", caption: "", date: "01 Aug 2025" },
+    { img: "New folder/รูปภาพ iCloud/IMG_7273.JPEG", caption: "", date: "02 Aug 2025" },
+    { img: "New folder/รูปภาพ iCloud/IMG_8190.JPG", caption: "", date: "13 May 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_8499.JPEG", caption: "", date: "11 Oct 2025" },
+    { img: "New folder/รูปภาพ iCloud/IMG_8506.JPEG", caption: "", date: "11 Oct 2025" },
+    { img: "New folder/รูปภาพ iCloud/IMG_8690.JPG", caption: "", date: "13 May 2026" },
+    { img: "New folder/รูปภาพ iCloud/IMG_9424.JPEG", caption: "", date: "05 Dec 2025" },
   ];
 
   function checkPw() {
@@ -401,6 +440,10 @@
       setTimeout(() => {
         document.getElementById('screen-web').classList.add('visible');
         initWeb();
+        const audio = document.getElementById('bg-music');
+        audio.play().catch(e => console.log("Audio play failed:", e));
+        musicOn = true;
+        updateMusicUI();
       }, 600);
     } else {
       const err = document.getElementById('pw-err');
@@ -626,25 +669,38 @@
   };
 
   let musicOn = false;
-  function toggleMusic(btn) {
-    musicOn = !musicOn;
+
+  function updateMusicUI() {
+    const btn = document.getElementById('music-btn');
     const icon = btn.querySelector('i');
     const txt = btn.querySelector('span');
-    const audio = document.getElementById('bg-music');
-    
     if (musicOn) {
       icon.className = 'ti ti-player-pause';
       txt.textContent = 'หยุดเพลง';
       btn.style.borderColor = 'rgba(255, 105, 180, .6)';
       btn.style.boxShadow = '0 0 10px rgba(255, 105, 180, 0.4)';
-      audio.play().catch(e => console.log("Audio play failed:", e));
     } else {
       icon.className = 'ti ti-player-play';
       txt.textContent = 'เพลง';
       btn.style.borderColor = '';
       btn.style.boxShadow = '';
+    }
+  }
+
+  function toggleMusic(btn) {
+    musicOn = !musicOn;
+    const audio = document.getElementById('bg-music');
+    
+    if (musicOn) {
+      audio.play().catch(e => console.log("Audio play failed:", e));
+    } else {
       audio.pause();
     }
+    updateMusicUI();
+  }
+
+  function changeVolume(val) {
+    document.getElementById('bg-music').volume = val;
   }
 
   document.getElementById('pw').addEventListener('keydown', e => { if (e.key === 'Enter') checkPw(); });
