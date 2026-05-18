@@ -1,0 +1,654 @@
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #17050f;
+  }
+
+  #app {
+    font-family: var(--font-sans, sans-serif);
+    background: #17050f;
+    /* Dark sparkling pink background */
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #screen-lock {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    background: #17050f;
+    transition: opacity .8s
+  }
+
+  #screen-lock.hidden {
+    opacity: 0;
+    pointer-events: none
+  }
+
+  .lock-title {
+    font-size: 13px;
+    letter-spacing: .2em;
+    color: #ff69b4;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+  }
+
+  .lock-heart {
+    font-size: 40px;
+    margin-bottom: 20px;
+    animation: pulse 2s ease-in-out infinite, glow 2s alternate infinite;
+  }
+
+  @keyframes pulse {
+
+    0%,
+    100% {
+      transform: scale(1)
+    }
+
+    50% {
+      transform: scale(1.12)
+    }
+  }
+
+  @keyframes glow {
+    0% {
+      filter: drop-shadow(0 0 5px rgba(255, 105, 180, 0.4));
+    }
+
+    100% {
+      filter: drop-shadow(0 0 20px rgba(255, 20, 147, 0.8));
+    }
+  }
+
+  .lock-subtitle {
+    font-size: 22px;
+    font-weight: 500;
+    color: #fff0f5;
+    margin-bottom: 6px
+  }
+
+  .lock-hint {
+    font-size: 13px;
+    color: #d87093;
+    margin-bottom: 28px
+  }
+
+  .pw-wrap {
+    display: flex;
+    gap: 8px;
+    align-items: center
+  }
+
+  .pw-input {
+    background: rgba(255, 192, 203, .06);
+    border: 1px solid rgba(255, 105, 180, .3);
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 15px;
+    color: #fff0f5;
+    width: 180px;
+    text-align: center;
+    letter-spacing: .15em;
+    outline: none;
+    transition: border .2s, box-shadow .2s;
+  }
+
+  .pw-input:focus {
+    border-color: rgba(255, 105, 180, .7);
+    box-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
+  }
+
+  .pw-btn {
+    background: rgba(255, 105, 180, .18);
+    border: 1px solid rgba(255, 105, 180, .4);
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-size: 14px;
+    color: #ffb6c1;
+    cursor: pointer;
+    transition: background .2s, box-shadow .2s;
+  }
+
+  .pw-btn:hover {
+    background: rgba(255, 105, 180, .3);
+    box-shadow: 0 0 10px rgba(255, 105, 180, 0.4);
+  }
+
+  .pw-error {
+    font-size: 12px;
+    color: #ff4d4d;
+    margin-top: 10px;
+    min-height: 18px;
+    text-align: center
+  }
+
+  #screen-web {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .8s
+  }
+
+  #screen-web.visible {
+    opacity: 1;
+    pointer-events: all
+  }
+
+  #spider-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%
+  }
+
+  .web-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 5
+  }
+
+  .web-title {
+    font-size: 12px;
+    letter-spacing: .18em;
+    color: #ff69b4;
+    text-transform: uppercase;
+    text-shadow: 0 0 5px rgba(255, 105, 180, 0.5);
+  }
+
+  .music-btn {
+    background: rgba(255, 192, 203, .07);
+    border: 1px solid rgba(255, 105, 180, .25);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: #ffb6c1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background .2s, box-shadow .2s;
+  }
+
+  .music-btn:hover {
+    background: rgba(255, 192, 203, .15);
+    box-shadow: 0 0 8px rgba(255, 105, 180, 0.4);
+  }
+
+  .photo-node {
+    position: absolute;
+    transform-origin: center center;
+    cursor: pointer;
+    transition: filter .25s;
+  }
+
+  .photo-node:hover {
+    filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 105, 180, 0.8));
+    z-index: 999 !important;
+  }
+
+  .photo-frame {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 105, 180, .6);
+    overflow: hidden;
+    background: rgba(255, 105, 180, .2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color .2s, box-shadow .2s, transform .2s;
+  }
+
+  .photo-node:hover .photo-frame {
+    border-color: rgba(255, 20, 147, 1);
+    box-shadow: 0 0 15px rgba(255, 105, 180, 0.8), inset 0 0 10px rgba(255, 105, 180, 0.5);
+    transform: scale(1.15);
+  }
+
+  .photo-month {
+    font-size: 9px;
+    color: #ff99cc;
+    text-align: center;
+    margin-top: 4px;
+    letter-spacing: .05em;
+    text-shadow: 0 0 4px rgba(255, 105, 180, 0.5);
+    transition: transform .2s;
+  }
+
+  .photo-node:hover .photo-month {
+    transform: scale(1.15);
+  }
+
+  #modal-wrap {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 5, 10, .85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .4s;
+    backdrop-filter: blur(4px);
+  }
+
+  #modal-wrap.open {
+    opacity: 1;
+    pointer-events: all
+  }
+
+  #modal-card {
+    background: #240a16;
+    border: 1px solid rgba(255, 105, 180, .4);
+    border-radius: 20px;
+    padding: 24px;
+    width: 280px;
+    text-align: center;
+    transform: scale(.88);
+    transition: transform .4s;
+    box-shadow: 0 0 30px rgba(255, 20, 147, 0.3);
+  }
+
+  #modal-wrap.open #modal-card {
+    transform: scale(1)
+  }
+
+  #modal-photo {
+    width: 200px;
+    height: 200px;
+    border-radius: 16px;
+    background: rgba(255, 105, 180, .15);
+    margin: 0 auto 14px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    box-shadow: inset 0 0 20px rgba(255, 105, 180, 0.2);
+  }
+
+  #modal-caption {
+    font-size: 14px;
+    color: #ffb6c1;
+    margin-bottom: 4px;
+    font-weight: 500;
+    text-shadow: 0 0 5px rgba(255, 105, 180, 0.4);
+  }
+
+  #modal-date {
+    font-size: 12px;
+    color: #d87093;
+    margin-bottom: 18px
+  }
+
+  .modal-close {
+    background: rgba(255, 192, 203, .1);
+    border: 1px solid rgba(255, 105, 180, .3);
+    border-radius: 10px;
+    padding: 8px 20px;
+    font-size: 13px;
+    color: #ffb6c1;
+    cursor: pointer;
+    transition: background .2s, box-shadow .2s;
+  }
+
+  .modal-close:hover {
+    background: rgba(255, 192, 203, .2);
+    box-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
+  }
+
+  @keyframes twinkle {
+
+    0%,
+    100% {
+      opacity: .3
+    }
+
+    50% {
+      opacity: 1
+    }
+  }
+</style>
+
+<h2 class="sr-only">Anniversary Spider Web App — UI prototype</h2>
+
+<div id="app">
+
+  <div id="screen-lock">
+    <div class="lock-heart">💖</div>
+    <div class="lock-title">1 year anniversary</div>
+    <div class="lock-subtitle">รหัสผ่านอะไรเอ่ย ??</div>
+    <div class="lock-hint">กรอกรหัสผ่านพิเศษเพื่อเปิด</div>
+    <div class="pw-wrap">
+      <input class="pw-input" id="pw" type="password" placeholder="••••••" maxlength="8"
+        onkeydown="if(event.key==='Enter')checkPw()" />
+      <button class="pw-btn" onclick="checkPw()">เปิด</button>
+    </div>
+    <div class="pw-error" id="pw-err"></div>
+  </div>
+
+  <div id="screen-web">
+    <canvas id="spider-canvas"></canvas>
+    <div class="web-top">
+      <span class="web-title">365 วัน ของเรา</span>
+      <button class="music-btn" onclick="toggleMusic(this)">
+        <i class="ti ti-player-play" style="font-size:14px" aria-hidden="true"></i>
+        <span>เพลง</span>
+      </button>
+    </div>
+    <div id="nodes-wrap"></div>
+  </div>
+
+  <div id="modal-wrap">
+    <div id="modal-card">
+      <div id="modal-photo"><span id="modal-emoji"></span></div>
+      <div id="modal-caption"></div>
+      <div id="modal-date"></div>
+      <button class="modal-close" onclick="closeModal()">
+        <i class="ti ti-x" style="font-size:14px" aria-hidden="true"></i> ปิด
+      </button>
+    </div>
+  </div>
+
+  <audio id="bg-music" loop>
+    <source src="bg-music.mp3" type="audio/mpeg">
+  </audio>
+
+</div>
+
+<script>
+  const PASS = "23052568";
+  const PHOTOS = [
+    { emoji: "🌸", caption: "วันแรกที่เจอกัน", date: "มิ.ย. 2567" },
+    { emoji: "🎬", caption: "หนังเรื่องแรก", date: "ก.ค. 2567" },
+    { emoji: "🍜", caption: "มื้อพิเศษด้วยกัน", date: "ส.ค. 2567" },
+    { emoji: "🌅", caption: "พระอาทิตย์ตก", date: "ก.ย. 2567" },
+    { emoji: "🎂", caption: "วันเกิดครั้งแรก", date: "ต.ค. 2567" },
+    { emoji: "🌊", caption: "ทะเลด้วยกัน", date: "พ.ย. 2567" },
+    { emoji: "🎄", caption: "คริสต์มาส", date: "ธ.ค. 2567" },
+    { emoji: "🎆", caption: "ปีใหม่ด้วยกัน", date: "ม.ค. 2568" },
+    { emoji: "💐", caption: "วาเลนไทน์", date: "ก.พ. 2568" },
+    { emoji: "🌿", caption: "เที่ยวด้วยกัน", date: "มี.ค. 2568" },
+    { emoji: "🎵", caption: "คอนเสิร์ตแรก", date: "เม.ย. 2568" },
+    { emoji: "💖", caption: "ครบ 1 ปี", date: "มิ.ย. 2568" },
+  ];
+
+  function checkPw() {
+    const v = document.getElementById('pw').value;
+    if (v === PASS) {
+      document.getElementById('pw-err').textContent = '';
+      document.getElementById('screen-lock').classList.add('hidden');
+      setTimeout(() => {
+        document.getElementById('screen-web').classList.add('visible');
+        initWeb();
+      }, 600);
+    } else {
+      const err = document.getElementById('pw-err');
+      err.textContent = 'รหัสไม่ถูกต้อง ลองใหม่นะ 💖';
+      document.getElementById('pw').value = '';
+    }
+  }
+
+  let webInit = false;
+  let angleY = 0;
+  let angleX = 0;
+  let canvas, ctx, W, H, cx, cy, R;
+  let animationFrameId;
+  const stars = [];
+
+  function initWeb() {
+    if (webInit) return; webInit = true;
+    const app = document.getElementById('app');
+    W = app.offsetWidth;
+    H = app.offsetHeight || 700;
+    cx = W / 2;
+    cy = H / 2;
+    R = Math.min(W, H) * 0.35; // Globe radius
+
+    canvas = document.getElementById('spider-canvas');
+    canvas.width = W;
+    canvas.height = H;
+    ctx = canvas.getContext('2d');
+
+    // Distribute photos on a 3D sphere using Fibonacci distribution
+    const goldenRatio = (1 + Math.sqrt(5)) / 2;
+    PHOTOS.forEach((p, i) => {
+      const theta = 2 * Math.PI * i / goldenRatio;
+      const phi = Math.acos(1 - 2 * (i + 0.5) / PHOTOS.length);
+      p.x3d = R * Math.sin(phi) * Math.cos(theta);
+      p.y3d = R * Math.cos(phi);
+      p.z3d = R * Math.sin(phi) * Math.sin(theta);
+    });
+
+    initStars();
+    buildNodes();
+
+    // Add drag interaction to rotate globe manually
+    let isDragging = false;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+    app.addEventListener('mousedown', (e) => { isDragging = true; lastMouseX = e.clientX; lastMouseY = e.clientY; });
+    app.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - lastMouseX;
+      const dy = e.clientY - lastMouseY;
+      angleY += dx * 0.005;
+      angleX += dy * 0.005;
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+    });
+    app.addEventListener('mouseup', () => { isDragging = false; });
+    app.addEventListener('mouseleave', () => { isDragging = false; });
+
+    app.addEventListener('touchstart', (e) => { isDragging = true; lastMouseX = e.touches[0].clientX; lastMouseY = e.touches[0].clientY; });
+    app.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      const dx = e.touches[0].clientX - lastMouseX;
+      const dy = e.touches[0].clientY - lastMouseY;
+      angleY += dx * 0.005;
+      angleX += dy * 0.005;
+      lastMouseX = e.touches[0].clientX;
+      lastMouseY = e.touches[0].clientY;
+    });
+    app.addEventListener('touchend', () => { isDragging = false; });
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      W = app.offsetWidth;
+      H = app.offsetHeight || 700;
+      cx = W / 2;
+      cy = H / 2;
+      R = Math.min(W, H) * 0.35;
+      canvas.width = W;
+      canvas.height = H;
+      initStars();
+    });
+
+    animate();
+  }
+
+  function initStars() {
+    stars.length = 0; // clear existing
+    for (let i = 0; i < 150; i++) {
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.5 + 0.5,
+        speed: Math.random() * 0.03 + 0.01,
+        alpha: Math.random() * 2,
+        color: Math.random() > 0.5 ? '255, 182, 193' : '255, 255, 255'
+      });
+    }
+  }
+
+  function renderStars() {
+    stars.forEach(s => {
+      s.alpha -= s.speed;
+      if (s.alpha < -1) {
+        s.alpha = 2;
+        s.x = Math.random() * W;
+        s.y = Math.random() * H;
+      }
+      const a = Math.max(0, Math.min(1, s.alpha));
+      if (a > 0) {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${s.color}, ${a})`;
+        ctx.fill();
+      }
+    });
+  }
+
+  function animate() {
+    angleY += 0.001; // Auto rotate slowly
+    angleX += 0.0003;
+
+    ctx.clearRect(0, 0, W, H);
+    renderStars();
+
+    const projected = [];
+    const sinY = Math.sin(angleY), cosY = Math.cos(angleY);
+    const sinX = Math.sin(angleX), cosX = Math.cos(angleX);
+
+    // Project 3D to 2D
+    PHOTOS.forEach((p, i) => {
+      // Rotate Y
+      let x = p.x3d * cosY - p.z3d * sinY;
+      let z = p.z3d * cosY + p.x3d * sinY;
+      let y = p.y3d;
+
+      // Rotate X
+      let y2 = y * cosX - z * sinX;
+      let z2 = z * cosX + y * sinX;
+      y = y2;
+      z = z2;
+
+      // Projection
+      const fov = 800; // perspective depth
+      const scale = fov / (fov + z);
+      const px = cx + x * scale;
+      const py = cy + y * scale;
+
+      projected.push({ x: px, y: py, z: z, scale: scale, index: i });
+
+      // Update DOM node
+      const node = document.getElementById(`node-${i}`);
+      if (node) {
+        node.style.left = px + 'px';
+        node.style.top = py + 'px';
+        node.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        node.style.zIndex = Math.round(scale * 100);
+
+        // Fade out nodes that are far in the back
+        const opacity = scale > 1 ? 1 : (0.1 + 0.9 * scale);
+        node.style.opacity = Math.max(0, Math.min(1, opacity));
+        node.style.pointerEvents = scale > 0.8 ? 'all' : 'none'; // only clickable if near front
+      }
+    });
+
+    // Draw globe connections
+    projected.forEach((a, i) => {
+      projected.forEach((b, j) => {
+        if (j <= i) return;
+
+        const p1 = PHOTOS[a.index];
+        const p2 = PHOTOS[b.index];
+        const dist3d = Math.hypot(p1.x3d - p2.x3d, p1.y3d - p2.y3d, p1.z3d - p2.z3d);
+
+        if (dist3d < R * 1.4) { // Connect nearby nodes to form a web/globe structure
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+
+          const avgZ = (a.z + b.z) / 2;
+          let alpha = (800 - avgZ) / 1600;
+          alpha = Math.max(0.02, Math.min(0.6, alpha * 0.8));
+
+          ctx.strokeStyle = `rgba(255, 105, 180, ${alpha})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      });
+    });
+
+    animationFrameId = requestAnimationFrame(animate);
+  }
+
+  function buildNodes() {
+    const wrap = document.getElementById('nodes-wrap');
+    wrap.innerHTML = '';
+    PHOTOS.forEach((p, i) => {
+      const el = document.createElement('div');
+      el.className = 'photo-node';
+      el.id = `node-${i}`;
+      el.innerHTML = `<div class="photo-frame" style="font-size:22px">${p.emoji}</div><div class="photo-month">${p.date.split(' ')[0]}</div>`;
+      el.onclick = () => openModal(p);
+      wrap.appendChild(el);
+    });
+  }
+
+  function openModal(p) {
+    document.getElementById('modal-emoji').textContent = p.emoji;
+    document.getElementById('modal-caption').textContent = p.caption;
+    document.getElementById('modal-date').textContent = p.date;
+    document.getElementById('modal-photo').style.fontSize = '72px';
+    document.getElementById('modal-wrap').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('modal-wrap').classList.remove('open');
+  }
+
+  document.getElementById('modal-wrap').onclick = function (e) {
+    if (e.target === this) closeModal();
+  };
+
+  let musicOn = false;
+  function toggleMusic(btn) {
+    musicOn = !musicOn;
+    const icon = btn.querySelector('i');
+    const txt = btn.querySelector('span');
+    const audio = document.getElementById('bg-music');
+    
+    if (musicOn) {
+      icon.className = 'ti ti-player-pause';
+      txt.textContent = 'หยุดเพลง';
+      btn.style.borderColor = 'rgba(255, 105, 180, .6)';
+      btn.style.boxShadow = '0 0 10px rgba(255, 105, 180, 0.4)';
+      audio.play().catch(e => console.log("Audio play failed:", e));
+    } else {
+      icon.className = 'ti ti-player-play';
+      txt.textContent = 'เพลง';
+      btn.style.borderColor = '';
+      btn.style.boxShadow = '';
+      audio.pause();
+    }
+  }
+
+  document.getElementById('pw').addEventListener('keydown', e => { if (e.key === 'Enter') checkPw(); });
+</script>
